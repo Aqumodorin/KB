@@ -1,0 +1,129 @@
+document.addEventListener('DOMContentLoaded', function() {
+    setPremiumUrls();
+
+    var optionParam = getQueryParam('option');
+
+    if (optionParam === 'upgrade-new') {
+        trackUpgradeSubmits();
+    } else if (optionParam === 'domains' || optionParam === 'subdomains') {
+        document.querySelectorAll('input[value^="Site Builder"], input[value^="SiteBuilder"]').forEach(function (element) {
+            element.parentNode.removeChild(element);
+        });
+    }
+
+    if (optionParam) {
+        insertTopAd();
+    } else {
+        insertStatsPanelAd();
+        replaceDomainForm();
+    }
+
+    document.getElementById("imgPoweredByCpanel").parentElement.parentElement.parentElement.style.display = 'none';
+
+    element = document.querySelector('#lnkHeaderHome font');
+    element.parentElement.removeChild(element);
+
+    element = document.getElementById('lnkUserPrefChangeLang');
+    element.parentElement.removeChild(element);
+
+    document.getElementById('lnkUserPrefChangePwd').setAttribute('href', 'https://app.infinityfree.net/accounts');
+    document.getElementById('lnkUserPrefChangePwd').innerHTML = 'Client Area';
+});
+
+function insertTopAd() {
+    row = document.createElement('div');
+    row.setAttribute('class', 'row');
+    row.innerHTML = '<div class="col-xs-12 col-md-12 text-center"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><ins class="adsbygoogle" style="display:block; height: 90px" data-full-width-responsive="true" data-ad-client="ca-pub-7281184434591176" data-ad-slot="3301284143"></ins><script (adsbygoogle = window.adsbygoogle || []).push({}); </script></div>';
+
+    content = document.getElementById('content');
+    content.insertBefore(row, content.firstChild);
+    (adsbygoogle = window.adsbygoogle || []).push({});
+}
+
+function setPremiumUrls() {
+    document.querySelectorAll('a[href^="https://ifastnet.com/portal"]').forEach(function(element) {
+        element.onclick = function (){
+            ga('send', 'event', 'iFastNet', 'Portal');
+        };
+
+        element.setAttribute('href', 'https://ifastnet.com/portal/aff.php?aff=23782');
+    });
+
+    document.querySelectorAll('a[href="http://ifastnet.com/cpanelpreview2.php"]').forEach(function(element) {
+        element.onclick = function() {
+            ga('send', 'event', 'iFastNet', 'CpanelPreview');
+        };
+    });
+
+    document.querySelectorAll('form[action^="https://ifastnet.com/portal/domainchecker.php"]').forEach(function(element) {
+        element.onsubmit = function() {
+            ga('send', 'event', 'iFastNet', 'SearchDomain');
+        };
+    });
+
+    document.querySelectorAll('a[href^="http://tutorials.securesignup.net"]').forEach(function(element) {
+        element.setAttribute('href', 'https://infinityfree.net/support/');
+    });
+}
+
+function trackUpgradeSubmits() {
+    $('a[href^="/panel/modules-new/upgrade-new/act_buynowbutton.php"]').click(function(){
+        var planTableFields = $('#subdomaintbl').find('td');
+        ga('send', 'event', 'iFastNet', 'SubmitUpgradeForm',
+            planTableFields.first().find('b').html()+' - '+planTableFields[1].textContent,
+            parseFloat($(planTableFields[4]).find('big').html().substr(1)) * 100
+        );
+    });
+}
+
+function insertStatsPanelAd() {
+    stats = document.getElementById('stats');
+
+    panel = document.createElement('div');
+    panel.setAttribute('class', 'panel panel-widget');
+    panel.innerHTML = '<div class="panel-heading widget-heading">Advertisement</div>' +
+        '<div class="panel-body">' +
+        '<div class="col-xs-12 col-md-12 text-center">' +
+        '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>' +
+        '<ins class="adsbygoogle" style="display:block" data-full-width-responsive="true" data-ad-client="ca-pub-7281184434591176" data-ad-slot="3301284143" data-ad-format="auto"></ins>' +
+        '</div></div>';
+
+    stats = document.getElementById('stats');
+    stats.insertBefore(panel, stats.firstChild);
+    (adsbygoogle = window.adsbygoogle || []).push({});
+}
+
+function replaceDomainForm() {
+    var domainForm = document.querySelector('form[action="https://ifastnet.com/portal/domainchecker.php"]');
+
+    domainForm.addEventListener('submit', function () {
+        ga('send', 'event', 'iFastNet', 'SearchDomain');
+    });
+
+    domainForm.classList.add('form-inline');
+
+    Array.from(domainForm.children).forEach(function (el) {
+        if ((el.nodeName === 'INPUT' && el.type !== 'hidden') || el.nodeName === 'SELECT') {
+            el.classList.add('form-control');
+            wrapper = document.createElement('div');
+            wrapper.classList.add('form-group');
+            wrapper.style = "margin: 20px; 10px;";
+            el.parentNode.insertBefore(wrapper, el);
+            wrapper.appendChild(el);
+        }
+    });
+}
+
+function getQueryParam(param) {
+    var input = param;
+    location.search.substr(1)
+        .split("&")
+        .some(function (item) { // returns first occurence and stops
+            return item.split("=")[0] === param && (param = item.split("=")[1])
+        });
+
+    if (input == param) {
+        return null;
+    }
+    return param;
+}
