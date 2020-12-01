@@ -1,0 +1,7 @@
+hint: bs4ps7$EKc$X&b5dispatchXhrRequest	@	xhr.js:177 1010
+
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
